@@ -4,10 +4,12 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from urllib import request
 from tensorflow.contrib import slim
+from tensorflow.python import pywrap_tensorflow
 import imagenet
 import inception_v1
 import inception_preprocessing
 import numpy as np
+import scipy.io
 
 # tf.reset_default_graph()
 # sess = tf.Session()
@@ -41,7 +43,7 @@ with tf.Graph().as_default():
 	
 	# Create the model, use the default arg scope to configure the batch norm parameters.
 	with slim.arg_scope(inception_v1.inception_v1_arg_scope()):
-		logits, _ = inception_v1.inception_v1(processed_images, num_classes=1001, is_training=False)
+		logits, endpoints = inception_v1.inception_v1(processed_images, num_classes=1001, is_training=False)
 	probabilities = tf.nn.softmax(logits)
 	
 	print ("Neural Network Built")
@@ -63,6 +65,14 @@ with tf.Graph().as_default():
 		np_image, probabilities = sess.run([image, probabilities])
 		probabilities = probabilities[0, 0:]
 		sorted_inds = [i[0] for i in sorted(enumerate(-probabilities), key=lambda x:x[1])]
+		# Save Reshaped Image
+		scipy.io.savemat('Image01', dict(image=processed_images.eval(session=sess)))
+		# Save Feature Maps
+		for key in endpoints:
+			scipy.io.savemat(key, dict(tensor=endpoints[key].eval(session=sess)))
+		
+		# writer = tf.summary.FileWriter("C:/Users/Eugene/Documents/UCLA/Research/matlab_nn/tf_inception")
+		# writer.add_graph(sess.graph)
 		
 		coord.request_stop()
 		coord.join(threads)
