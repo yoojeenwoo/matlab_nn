@@ -61,22 +61,22 @@ with tf.Graph().as_default():
 		threads = tf.train.start_queue_runners(coord=coord)
 	
 		init_fn(sess)
-		# np_image, probabilities = sess.run([image, probabilities])
 		np_image, probabilities = sess.run([image, probabilities])
+		# print(sess.run('InceptionV1/InceptionV1/Conv2d_1a_7x7/Conv2D'))
 		probabilities = probabilities[0, 0:]
 		sorted_inds = [i[0] for i in sorted(enumerate(-probabilities), key=lambda x:x[1])]
-		# Save Reshaped Image
-		scipy.io.savemat('Image01', dict(image=processed_images.eval(session=sess)))
-		# Save Feature Maps
+		## Save Reshaped Image
+		# scipy.io.savemat('Image01', dict(image=processed_images.eval(session=sess)))
+		## Save Feature Maps
 		for key in endpoints:
 			scipy.io.savemat(key, dict(tensor=endpoints[key].eval(session=sess)))
-		
+		## Write Graph to TensorBoard
 		# writer = tf.summary.FileWriter("C:/Users/Eugene/Documents/UCLA/Research/matlab_nn/tf_inception")
 		# writer.add_graph(sess.graph)
 		
 		coord.request_stop()
 		coord.join(threads)
-	
+		
 	plt.figure()
 	plt.imshow(np_image.astype(np.uint8))
 	plt.axis('off')

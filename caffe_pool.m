@@ -16,16 +16,18 @@ F = ker_size;
 P = pad; % pad = 0;
 S = stride;
 % W_O = (W-F+2*P)/S + 1;
-W_O = floor((W-F+2*P)/S) + 1;
+W_O = (W-F+P(1)+P(2))/S + 1;
 N_IN = fm_in_size(3);
 N_OUT = N_IN;
-fm_pad_size = [W+2*P, W+2*P, N_IN];
+% fm_pad_size = [W+2*P, W+2*P, N_IN];
+fm_pad_size = [W+P(1)+P(2),W+P(1)+P(2), N_IN];
 fm_out_size = [W_O,W_O,N_OUT];
 
 % padding
 fm_pad = zeros(fm_pad_size);
 % fm_pad = fi(fm_pad, 1, fm_in.WordLength, fm_in.FractionLength,  'SumMode', fm_in.SumMode, 'SumWordLength',fm_in.SumWordLength);
-fm_pad(1+pad:end-pad, 1+pad:end-pad, :) = fm_in;
+% fm_pad(1+pad:end-pad, 1+pad:end-pad, :) = fm_in;
+fm_pad(1+pad(1):end-pad(2), 1+pad(1):end-pad(2),:) = fm_in;
 
 % preprocess fm_in
 fm_in_3d = zeros(W_O*W_O, F*F,N_IN);

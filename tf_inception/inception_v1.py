@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow as tf
+from tensorflow.python import pywrap_tensorflow
 
 # from nets import inception_utils
 import inception_utils
@@ -61,7 +62,9 @@ def inception_v1_base(inputs,
       with slim.arg_scope([slim.conv2d, slim.max_pool2d],
                           stride=1, padding='SAME'):
         end_point = 'Conv2d_1a_7x7'
+        # net = slim.conv2d(inputs, 64, [7, 7], stride=2, activation_fn=None, biases_initializer=None, normalizer_fn=None, weights_regularizer=None, scope=end_point)
         net = slim.conv2d(inputs, 64, [7, 7], stride=2, scope=end_point)
+        end_points['TEST'] = inputs
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
         end_point = 'MaxPool_2a_3x3'
@@ -69,7 +72,7 @@ def inception_v1_base(inputs,
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
         end_point = 'Conv2d_2b_1x1'
-        net = slim.conv2d(net, 64, [1, 1], scope=end_point)
+        net = slim.conv2d(net, 64, [1, 1], activation_fn=None, biases_initializer=None, normalizer_fn=None, scope=end_point)
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
         end_point = 'Conv2d_2c_3x3'

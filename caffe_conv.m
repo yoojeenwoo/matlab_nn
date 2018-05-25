@@ -9,11 +9,11 @@ if nargin < 4
     ker_in(:,:,:,i) = fm_in+i-1;
   end
   stride = 2;
-  pad = 1;
+  pad = [1, 1];
 end
 %% input parameters
 % assert(1==exist('stride', 'var'), 'stride undefined!');
-if ~exist('pad','var')  pad=0; end
+if ~exist('pad','var')  pad=[0,0]; end
 
 
 %% function starts
@@ -26,21 +26,30 @@ F = ker_size(1);
 P = pad;
 S = stride;
 % W_O = (W-F+2*P)/S + 1;
-W_O = floor((W-F+2*P)/S) + 1;
+W_O = (W-F+P(1)+P(2))/S + 1;
 N_IN = fm_in_size(3);
 N_OUT = ker_size(4);
-fm_pad_size = [W+2*P, W+2*P, N_IN];
+% fm_pad_size = [W+2*P, W+2*P, N_IN];
+fm_pad_size = [W+P(1)+P(2), W+P(1)+P(2), N_IN];
 fm_out_size = [W_O,W_O,N_OUT];
 
 
 % padding
 fm_pad = zeros(fm_pad_size);
 % fm_pad = fi(fm_pad, 1, fm_in.WordLength, fm_in.FractionLength,  'SumMode', fm_in.SumMode, 'SumWordLength',fm_in.SumWordLength);
-fm_pad(1+pad:end-pad, 1+pad:end-pad, :) = fm_in;
+% fm_pad(1+pad:end-pad, 1+pad:end-pad, :) = fm_in;
+fm_pad(1+pad(1):end-pad(2), 1+pad(1):end-pad(2), :) = fm_in;
 
+% ker_in = permute(ker_in,[2,1,3,4]);
+
+% for x = 1:N_IN
+%   ker_in_re(:,:,x,:) = ker_in(:,:,N_IN + 1 - x,:);
+% end
 
 % preprocess kernels
 ker_2d = reshape(ker_in, [F*F*N_IN, N_OUT]);
+
+
 % preprocess fm_in
 fm_in_2d = single(zeros(W_O*W_O, F*F*N_IN));
 
