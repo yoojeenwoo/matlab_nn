@@ -37,9 +37,9 @@ fm_input_data = single(squeeze(input_image));
 %% process each layer
 
 %conv1 layer0
-% fm_conv1 = caffe_conv(fm_input_data, conv_1a_weights, 2, 3);
-fm_conv1 = caffe_conv(fm_input_data, conv_1a_weights./reshape(conv_1a_batchvar + EPSILON, 1, 1, 1, []), 2, [2, 3]);
-fm_conv1 = scale_add_bias(fm_conv1, -conv_1a_batchmean./(conv_1a_batchvar + EPSILON) + conv_1a_batchbeta);
+fm_conv1 = caffe_conv(fm_input_data, conv_1a_weights, 2, [2, 3]);
+fm_conv1 = caffe_conv(fm_input_data, conv_1a_weights./sqrt(reshape(conv_1a_batchvar + EPSILON, 1, 1, 1, [])), 2, [2, 3]);
+fm_conv1 = scale_add_bias(fm_conv1, -conv_1a_batchmean./sqrt(conv_1a_batchvar + EPSILON) + conv_1a_batchbeta);
 fm_conv1 = caffe_relu(fm_conv1);
 
 %pool1 layer1
@@ -47,12 +47,12 @@ fm_pool1 = caffe_pool(fm_conv1, 3, 2, [0, 1]);
 
 %conv2 layer2
 fm_conv2 = caffe_conv(fm_pool1, conv_2b_weights, 1, [0, 0]);
-fm_conv2 = scale_add_bias(fm_conv2, -conv_2b_batchmean./(conv_2b_batchvar + EPSILON) + conv_2b_batchbeta);
+fm_conv2 = scale_add_bias(fm_conv2, -conv_2b_batchmean./sqrt(conv_2b_batchvar + EPSILON) + conv_2b_batchbeta);
 fm_conv2 = caffe_relu(fm_conv2);
 
 %conv3 layer3
-fm_conv3 = caffe_conv(fm_conv2, conv_2c_weights./reshape(conv_2c_batchvar + EPSILON, 1, 1, 1, []), 1, [1, 1]);
-fm_conv3 = scale_add_bias(fm_conv3, -conv_2c_batchmean./(conv_2c_batchvar + EPSILON) + conv_2c_batchbeta);
+fm_conv3 = caffe_conv(fm_conv2, conv_2c_weights./sqrt(reshape(conv_2c_batchvar + EPSILON, 1, 1, 1, [])), 1, [1, 1]);
+fm_conv3 = scale_add_bias(fm_conv3, -conv_2c_batchmean./sqrt((conv_2c_batchvar + EPSILON)) + conv_2c_batchbeta);
 fm_conv3 = caffe_relu(fm_conv3);
 
 %pool2 layer4
