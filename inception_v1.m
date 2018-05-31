@@ -12,8 +12,9 @@ n = length(DIS);
 
 for i = 1:n
     data = load([mydir,DIS(i).name]);
-%     eval([DIS(i).name(1:length(DIS(i).name)-4) ' = single(data.' DIS(i).name(1:length(DIS(i).name)-4) ');']); 
-    eval([DIS(i).name(1:length(DIS(i).name)-4) ' = single(data.weights);']); 
+%     eval([DIS(i).name(1:length(DIS(i).name)-4) ' = single(data.weights);']); 
+    eval([DIS(i).name(1:length(DIS(i).name)-4) ' = single(fi_best(data.weights, 1, 8));']); 
+
 end
 
 % load input
@@ -30,14 +31,12 @@ for image = 1:n
 
 % input preprocessing
 fm_input_data = single(squeeze(input_image));
-% fm_input_data = single(reshape(input_image, 224, 224, 3));
-% fm_input_data = permute(fm_input_data, [2, 1, 3]);
+% fm_input_data = single(fi(fm_input_data, 1, 8, 4));
 
 
 %% process each layer
 
 %conv1 layer0
-% fm_conv1 = caffe_conv(fm_input_data, conv_1a_weights, 2, [2, 3]);
 fm_conv1 = caffe_conv(fm_input_data, conv_1a_weights./sqrt(reshape(conv_1a_batchvar + EPSILON, 1, 1, 1, [])), 2, [2, 3]);
 fm_conv1 = scale_add_bias(fm_conv1, -conv_1a_batchmean./sqrt(conv_1a_batchvar + EPSILON) + conv_1a_batchbeta);
 fm_conv1 = caffe_relu(fm_conv1);
